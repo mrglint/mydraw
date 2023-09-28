@@ -24,3 +24,36 @@ alt business logic throw exception
 end alt
 
 @enduml
+
+
+
+
+
+
+@KafkaListener(topics = "quickstart-events", groupId = "test-group")
+    public void process(ConsumerRecord<String, String> record, Acknowledgment ack) {
+        String message = record.value();
+//        if (message.equals("1")) {
+//            try {
+//                int i = 1 / 0;
+//            } catch (Exception e) {
+//                //
+//                ack.nack(2000);
+//            }
+//        } else {
+//            System.out.println("success");
+//            ack.acknowledge();
+//        }
+
+        try {
+            // normal business logic
+            // ...
+            // ack to kafka server
+            ack.acknowledge();
+        } catch (Exception e) {
+            // don't ack to kafkaserver, after 2 seconds will receive the event again.
+            // but we use a retry times limit, 
+            // otherwise, subsequent messages in the same partition will be blocked.
+            ack.nack(2000);
+        }
+    }
