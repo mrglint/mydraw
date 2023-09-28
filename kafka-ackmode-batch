@@ -1,0 +1,25 @@
+@startuml
+title AckMode.BATCH is default mode
+ListenerConsumer -> ListenerConsumer : pollAndInvoke
+note left
+    ListenerConsumer is
+    consumer thread
+end note
+alt business logic throw exception
+    ListenerConsumer -> Listener : listener
+    note left
+        business logic write in Listener
+        that decorate by @KafkaListener
+    end note
+    ListenerConsumer -> SeekToCurrentErrorHandler : invokeErrorHandler
+    ListenerConsumer -> ListenerConsumer : ackCurrent
+    activate ListenerConsumer
+        ListenerConsumer -> KafkaServer : commitOffset
+    deactivate ListenerConsumer
+    note left
+        lead to skipping event that occurs an exception ,
+        missing event happen in here
+    end note
+end alt
+
+@enduml
