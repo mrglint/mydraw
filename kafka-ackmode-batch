@@ -12,10 +12,11 @@ alt business logic throw exception
         that decorate by @KafkaListener
     end note
     ListenerConsumer -> SeekToCurrentErrorHandler : invokeErrorHandler
+    note left
+        will retry 10 times if consume event exception
+    end note
     ListenerConsumer -> ListenerConsumer : ackCurrent
-    activate ListenerConsumer
-        ListenerConsumer -> KafkaServer : commitOffset
-    deactivate ListenerConsumer
+    ListenerConsumer -> KafkaServer : commitOffset
     note left
         lead to skipping event that occurs an exception ,
         missing event happen in here
